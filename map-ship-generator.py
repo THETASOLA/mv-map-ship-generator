@@ -145,8 +145,12 @@ if not os.path.exists(path_output_img):
     os.makedirs(path_output_img)
 bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append']
 
+# Add the mapImage tag to the blueprints
+def add_map_tag(bp_file, icon_name):
+    bp_file.write(f'    <mapImage>{icon_name}</mapImage>\n')
+
 # Run the process for each ship blueprint
-def process_bp_line(bp_file, line, oldImage=None):
+def process_bp_line(bp_file, line, oldImage=None, icon_name_pointer=[""]):
     bp_name = re.search('name="([_A-Z0-9]+)"', line).group(1)
     img_name = re.search('img="([_a-zA-Z0-9]+)"', line).group(1)
     img_path = path + '/img/ship/' + img_name + "_base.png"
@@ -171,7 +175,6 @@ def process_bp_line(bp_file, line, oldImage=None):
         
         # Check if the icon is identical to the old icon, if so skip it
         if oldImage is not None and processor.compare_image(oldImage.canvas) < 0.02:
-            print('Icon is identical to old icon, skipping')
             icon_name = oldImage.output_path + '.png'
             processor = oldImage
         else:
@@ -181,18 +184,25 @@ def process_bp_line(bp_file, line, oldImage=None):
         bp_file.write(f'<mod:findName type="shipBlueprint" name="{bp_name}">\n')
         bp_file.write(f'    <mod-append:mapImage>{icon_name}</mod-append:mapImage>\n')
         bp_file.write('</mod:findName>\n\n')
+        icon_name_pointer[0] = icon_name
+        
         return processor
 
 print('Starting map icon generation')
 # Iterate through all lines in the blueprint files
 for bp_file in bp_files:
-    bp_file_w = open(path_output_data + '/' + bp_file, 'w')
+    bp_file_w =  [open(path_output_data + '/' + bp_file  + ".add", 'w'), open(path_output_data + '/' + bp_file, 'w')]
     bp_path = path + '/data/' + bp_file
-    oldImage = None
+    oldImage, icon_name = None, [""]
+
     if os.path.exists(bp_path):
         with open(bp_path) as bp:
             for line in bp:
-                line.strip()
-                if line.startswith('<shipBlueprint'):
-                    oldImage = process_bp_line(bp_file_w, line, oldImage)
-    bp_file_w.close()
+                if line.strip().startswith('<shipBlueprint'):
+                    oldImage = process_bp_line(bp_file_w[0], line.strip(), oldImage, icon_name)
+                elif line.strip().endswith('</shipBlueprint>'):
+                    add_map_tag(bp_file_w[1], icon_name[0])
+                
+                bp_file_w[1].write(line)
+    bp_file_w[0].close()
+    bp_file_w[1].close()
