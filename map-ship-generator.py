@@ -165,6 +165,7 @@ def process_bp_line(bp_file, line):
         bp_file.write(f'    <mod-append:mapImage>{icon_name}</mod-append:mapImage>\n')
         bp_file.write('</mod:findName>\n\n')
 
+print('Starting map icon generation')
 # Iterate through all lines in the blueprint files
 for bp_file in bp_files:
     bp_file_w = open(path_output_data + '/' + bp_file, 'w')
