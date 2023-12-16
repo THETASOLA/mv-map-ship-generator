@@ -153,7 +153,7 @@ dmypy.json
 cython_debug/
 
 # Data files
-map_ship_res/map_icon_*
+#map_ship_res/map_icon_*
 input/
 data/
 img/
