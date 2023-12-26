@@ -175,7 +175,7 @@ def process_bp_line(bp_file, line, oldImage=None, icon_name_pointer=[""]):
         
         # Check if the icon is identical to the old icon, if so skip it
         if oldImage is not None and processor.compare_image(oldImage.canvas) < 0.02:
-            icon_name = oldImage.output_path + '.png'
+            icon_name = oldImage.output_path.split('/')[-1]
             processor = oldImage
         else:
             processor.save_images(path_output_img + '/' + icon_name)
