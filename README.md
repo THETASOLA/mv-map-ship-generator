@@ -1,7 +1,7 @@
 # MV map ship image generator
 ## Usage
 
-Drag and drop your mod folder into `map-ship-generator.py`.
+Drag and drop your mod folder into `map-ship-generator.py`. Once it completes, you can run `map-ship-optimizer.py` to remove multiple instances of the same icon.
 
 If you already have a ship image, you can add it into map_ship_res/ to generate it with shadow and blue/red halo. The name must match the ship sprite name in the folder with the added prefix "map_icon_".
 
