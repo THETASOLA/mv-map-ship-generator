@@ -111,29 +111,19 @@ class ImageProcessor:
                     self.canvas_shadow.putpixel((x, y), (0, 0, 0) + (int(0.8*pixel[3]),))
     
     def save_images(self, output_path):
-        
-        self.output_path = output_path
         # Save normal image
         normal = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
         normal.alpha_composite(self.canvas_shadow, dest=(3, 4), source=(0, 0))
         normal.alpha_composite(self.canvas_glow)
         normal.alpha_composite(self.canvas)
-        normal.save(self.output_path + '.png')
+        normal.save(output_path + '.png')
         
         # Save nofuel image
         normal = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
         normal.alpha_composite(self.canvas_shadow, dest=(3, 4), source=(0, 0))
         normal.alpha_composite(self.canvas_red)
         normal.alpha_composite(self.canvas)
-        normal.save(self.output_path + '_fuel.png')
-    
-    def compare_image(self, other):
-        mismatches = 0
-        for x in range(self.canvas.size[0]):
-            for y in range(self.canvas.size[1]):
-                if self.canvas.getpixel((x, y)) != other.getpixel((x, y)):
-                    mismatches += 1
-        return mismatches / (self.canvas.size[0] * self.canvas.size[1])
+        normal.save(output_path + '_fuel.png')
 
 # Set input and output folder
 path = sys.argv[1]
@@ -145,12 +135,8 @@ if not os.path.exists(path_output_img):
     os.makedirs(path_output_img)
 bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append']
 
-# Add the mapImage tag to the blueprints
-def add_map_tag(bp_file, icon_name):
-    bp_file.write(f'    <mapImage>{icon_name}</mapImage>\n')
-
 # Run the process for each ship blueprint
-def process_bp_line(bp_file, line, oldImage=None, icon_name_pointer=[""]):
+def process_bp_line(bp_file, line):
     bp_name = re.search('name="([_A-Z0-9]+)"', line).group(1)
     img_name = re.search('img="([_a-zA-Z0-9]+)"', line).group(1)
     img_path = path + '/img/ship/' + img_name + "_base.png"
@@ -172,37 +158,21 @@ def process_bp_line(bp_file, line, oldImage=None, icon_name_pointer=[""]):
             processor.handle_symmetry()
         processor.draw_glow()
         processor.draw_shadow()
+        processor.save_images(path_output_img + '/' + icon_name)
         
-        # Check if the icon is identical to the old icon, if so skip it
-        if oldImage is not None and processor.compare_image(oldImage.canvas) < 0.02:
-            icon_name = oldImage.output_path.split('/')[-1]
-            processor = oldImage
-        else:
-            processor.save_images(path_output_img + '/' + icon_name)
-            
         # Write map icons to blueprints
         bp_file.write(f'<mod:findName type="shipBlueprint" name="{bp_name}">\n')
         bp_file.write(f'    <mod-append:mapImage>{icon_name}</mod-append:mapImage>\n')
         bp_file.write('</mod:findName>\n\n')
-        icon_name_pointer[0] = icon_name
-        
-        return processor
 
-print('Starting map icon generation')
 # Iterate through all lines in the blueprint files
 for bp_file in bp_files:
-    bp_file_w =  [open(path_output_data + '/' + bp_file  + ".add", 'w'), open(path_output_data + '/' + bp_file, 'w')]
+    bp_file_w = open(path_output_data + '/' + bp_file, 'w')
     bp_path = path + '/data/' + bp_file
-    oldImage, icon_name = None, [""]
-
     if os.path.exists(bp_path):
         with open(bp_path) as bp:
             for line in bp:
-                if line.strip().startswith('<shipBlueprint'):
-                    oldImage = process_bp_line(bp_file_w[0], line.strip(), oldImage, icon_name)
-                elif line.strip().endswith('</shipBlueprint>'):
-                    add_map_tag(bp_file_w[1], icon_name[0])
-                
-                bp_file_w[1].write(line)
-    bp_file_w[0].close()
-    bp_file_w[1].close()
+                line.strip()
+                if line.startswith('<shipBlueprint'):
+                    process_bp_line(bp_file_w, line)
+    bp_file_w.close()
