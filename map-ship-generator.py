@@ -5,7 +5,7 @@ from PIL import Image, ImageFilter
 
 class ImageProcessor:
     def __init__(self, input_path):
-        self.img = Image.open(input_path)
+        self.img = Image.open(input_path).convert('RGBA')
         self.canvas = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
         self.canvas_glow = None
         self.canvas_shadow = None
