@@ -165,12 +165,12 @@ def process_bp_line(bp_file, line):
 
 # Iterate through all lines in the blueprint files
 for bp_file in bp_files:
-    bp_file_w = open(path_output_data + '/' + bp_file, 'w')
+    bp_file_w = open(path_output_data + '/' + bp_file, 'w', encoding='utf-8')
     bp_path = path + '/data/' + bp_file
     if os.path.exists(bp_path):
-        with open(bp_path) as bp:
+        with open(bp_path, encoding='utf-8') as bp:
             for line in bp:
-                line.strip()
+                line = line.strip()
                 if line.startswith('<shipBlueprint'):
                     icon_name = process_bp_line(bp_file_w, line)
 
@@ -178,4 +178,5 @@ for bp_file in bp_files:
                     bp_file_w.write(f"\t<mv-mapImage>{icon_name}</mv-mapImage>\n</shipBlueprint>")
                 else:
                     bp_file_w.write(line)
+
     bp_file_w.close()
