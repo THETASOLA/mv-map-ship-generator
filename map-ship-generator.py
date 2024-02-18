@@ -137,6 +137,7 @@ bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append']
 
 # Run the process for each ship blueprint
 def process_bp_line(bp_file, line):
+    icon_name = ""
     bp_name = re.search('name="([_A-Z0-9]+)"', line).group(1)
     img_name = re.search('img="([_a-zA-Z0-9]+)"', line).group(1)
     img_path = path + '/img/ship/' + img_name + "_base.png"
@@ -159,11 +160,8 @@ def process_bp_line(bp_file, line):
         processor.draw_glow()
         processor.draw_shadow()
         processor.save_images(path_output_img + '/' + icon_name)
-        
-        # Write map icons to blueprints
-        bp_file.write(f'<mod:findName type="shipBlueprint" name="{bp_name}">\n')
-        bp_file.write(f'    <mod-append:mapImage>{icon_name}</mod-append:mapImage>\n')
-        bp_file.write('</mod:findName>\n\n')
+
+    return icon_name
 
 # Iterate through all lines in the blueprint files
 for bp_file in bp_files:
@@ -174,5 +172,10 @@ for bp_file in bp_files:
             for line in bp:
                 line.strip()
                 if line.startswith('<shipBlueprint'):
-                    process_bp_line(bp_file_w, line)
+                    icon_name = process_bp_line(bp_file_w, line)
+
+                if line.startswith('</shipBlueprint>') and icon_name != "":
+                    bp_file_w.write(f"\t<mv-mapImage>{icon_name}</mv-mapImage>\n</shipBlueprint>")
+                else:
+                    bp_file_w.write(line)
     bp_file_w.close()

@@ -41,7 +41,7 @@ for bp_file_name in bp_files:
     result = ''
     with open(path_data + '/' + bp_file_name, 'r') as bp_file:
         for line in bp_file:
-            r = re.search('<mod-append:mapImage>([_a-zA-Z0-9]+)</mod-append:mapImage>', line)
+            r = re.search('<mod-append:mv-mapImage>([_a-zA-Z0-9]+)</mod-append:mv-mapImage>', line)
             if r != None:
                 img_name = r.group(1)
                 img_path = path_img + '/' + img_name + '.png'
