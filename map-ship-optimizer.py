@@ -6,7 +6,7 @@ from PIL import Image, ImageFilter
 # File setup
 path_data = 'data'
 path_img = 'img/map'
-bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append']
+bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append', 'dlcBlueprintsOverwrite.xml.append']
 
 # List of sets of duplicates
 replace_lists = []
