@@ -133,7 +133,7 @@ if not os.path.exists(path_output_data):
 path_output_img = 'img/map'
 if not os.path.exists(path_output_img):
     os.makedirs(path_output_img)
-bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append']
+bp_files = ['blueprints.xml.append', 'dlcBlueprints.xml.append', 'dlcBlueprintsOverwrite.xml.append']
 
 # Run the process for each ship blueprint
 def process_bp_line(bp_file, line):
